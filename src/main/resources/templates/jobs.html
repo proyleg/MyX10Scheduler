@@ -1,0 +1,102 @@
+<!DOCTYPE html >
+<th:block th:include="fragments/headerinc :: head"></th:block>
+<script type="text/javascript" language="javascript" class="init">
+    $(document).ready(function () {
+        var pathArray = window.location.pathname.split('/');
+        $('#jobs_list').DataTable({
+            order: [[1, "asc"]],
+            stateSave: true,
+//            stateDuration: -1,
+            columnDefs: [
+                {"orderable": false, "targets": 6},
+                {"orderable": false, "targets": 7},
+                {"orderable": false, "targets": 8},
+                {"orderable": false, "targets": 10}
+            ],
+            "language": {
+                "url": "/" + pathArray[1] + "/DataTables/i18n/French.json"
+            }
+        });
+    });
+</script>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jobs</title>
+</head>
+<body>
+<div class="container">
+    <!--/*@thymesVar id="jobs" type="java.lang.Iterable<com.myscheduler.model.JobToSchedule>"*/-->
+    <div class="table-responsive" th:if="!${#lists.isEmpty(jobs)}">
+        <h2>Liste des jobs</h2>
+        <table class="table table-bordered table-condensed" id="jobs_list">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Heure</th>
+                <th>Offset</th>
+                <th>Sécurité</th>
+                <th>Edit</th>
+                <th>Dupliquer</th>
+                <th>Delete</th>
+                <th>
+                    <div>Activer/</div>
+                    <div>Désactiver</div>
+                </th>
+                <th>Exécute</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Heure</th>
+                <th>Offset</th>
+                <th>Sécurité</th>
+                <th>Edit</th>
+                <th>Dupliquer</th>
+                <th>Delete</th>
+                <th>
+                    <div>Activer/</div>
+                    <div>Désactiver</div>
+                </th>
+                <th>Exécute</th>
+            </tr>
+            </tfoot>
+            <tr th:each="job : ${jobs}"
+                th:class="${job.status==T(com.myscheduler.model.StatusType).Active} ? success : danger">
+                <!--/*@thymesVar id="job" type="com.myscheduler.model.JobToSchedule"*/-->
+                <td th:text="${job.idJob}">Id</td>
+                <td th:text="${job.name}">Nom</td>
+                <td th:text="${job.scheduleType}">Type</td>
+                <td th:text="${#dates.format(job.scheduleTime,'HH:mm')}">Heure</td>
+                <td th:text="${job.offset}">Type</td>
+                <td th:text="${job.security} ? 'Oui' : 'Non'"></td>
+                <td><a class="btn btn-default btn-sm active" th:href="@{/job/edit/} + ${job.idJob}">Edit</a></td>
+                <td><a class="btn btn-default btn-sm active" th:href="@{/job/duplicate/} + ${job.idJob}">Dupliquer</a>
+                </td>
+                <td><a class="btn btn-default btn-sm active" th:href="@{/job/delete/} + ${job.idJob}">Delete</a></td>
+                <td th:if="${job.status==T(com.myscheduler.model.StatusType).Inactive}"><a
+                        class="btn btn-default btn-sm active" th:href="@{/job/dis-active/} + ${job.idJob}">Activer</a>
+                </td>
+                <td th:if="${job.status==T(com.myscheduler.model.StatusType).Active}"><a
+                        class="btn btn-default btn-sm active"
+                        th:href="@{/job/dis-active/} + ${job.idJob}">Désactiver</a></td>
+                <td><a class="btn btn-default btn-sm active" th:href="@{/job/executenow/} + ${job.idJob}">Exécute</a>
+                </td>
+            </tr>
+        </table>
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" th:href="@{/job/new}">Crée une Job</a></li>
+                    <li><a href="#" th:href="@{/scheduledjobs}">Voir les Jobs cédulées</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

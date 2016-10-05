@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<th:block th:include="fragments/headerinc :: head"></th:block>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+
+    <title>Job</title>
+
+</head>
+<body>
+<div class="container">
+    <div class="container">
+
+        <h2>Détail de job</h2>
+
+        <!--/*@thymesVar id="jobToSchedule" type="com.myscheduler.model.JobToSchedule"*/-->
+
+        <!--<form class="form-horizontal" th:object="${jobToSchedule}" th:action="@{'/job/edit/' + ${jobToSchedule.idJob}}"-->
+        <form class="form-horizontal" th:object="${jobToSchedule}" th:action="@{/job}"
+              method="post">
+
+            <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <p class="sr-only">Errors:</p>
+                <ul>
+                    <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Validation Error</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" th:field="*{idJob}"/>
+                <input type="hidden" th:field="*{version}"/>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">Nom:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" th:field="*{name}" title=""/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">Commande:</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" th:field="*{command}" title="">
+                            <option th:each="commandValue : ${T(com.myscheduler.model.CommandType).values()}"
+                                    th:value="${commandValue}"
+                                    th:text="${commandValue}"></option>
+                        </select></div>
+                </div>
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-1 control-label">Module:</label>-->
+                    <!--<div class="col-sm-10">-->
+                        <!--<input class="form-control" th:field="*{module}" title=""/>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">Module:</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" th:field="*{module}" title="">
+                            <!--/*@thymesVar id="modules" type="java.lang.Iterable<com.myscheduler.model.Module>"*/-->
+                            <option th:each="moduleValue : ${modules}"
+                                    th:value="${moduleValue.id}"
+                                    th:text="${moduleValue.name}"></option>
+                        </select></div>
+                </div>
+
+
+            <!--<div class="form-group">-->
+            <!--<label class="col-sm-1 control-label">Output:</label>-->
+            <!--<div class="col-sm-10">-->
+            <!--<input class="form-control" th:field="*{outputFile}" title=""/>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+            <!--<label class="col-sm-1 control-label">Répertoire:</label>-->
+            <!--<div class="col-sm-10">-->
+            <!--<input class="form-control" th:field="*{directory}" title=""/></div>-->
+            <!--</div>-->
+            <div class="form-group">
+                <label class="col-sm-1 control-label">Type:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{scheduleType}" title="">
+                        <option th:each="scheduleValue : ${T(com.myscheduler.model.ScheduleType).values()}"
+                                th:value="${scheduleValue}"
+                                th:text="${scheduleValue}"></option>
+                    </select></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">Heure (HH:ss):</label>
+                <div class="col-sm-10">
+                    <input class="form-control" th:field="*{scheduleTime}" title=""/></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">Offset:</label>
+                <div class="col-sm-10">
+                    <input class="form-control" th:field="*{offset}" title=""/></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">Sécurité:</label>
+                <div class="col-sm-10">
+                    <input class="form-control-static" type="checkbox" th:field="*{security}" title=""/></div>
+            </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">Envoie multiple:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control-static" type="checkbox" th:field="*{multiSend}" title=""/></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">Température ></label>
+                    <div class="col-sm-10">
+                        <input class="form-control" th:field="*{temperature}" title=""/></div>
+                </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">Status:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{status}" title="">
+                        <option th:each="statusValue : ${T(com.myscheduler.model.StatusType).values()}"
+                                th:value="${statusValue}"
+                                th:text="${statusValue}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-inline col-sm-offset-1">
+                    <input type="checkbox" th:field="*{sunday}"/>Dimanche
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{monday}"/>Lundi
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{tuesday}"/>Mardi
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{wednesday}"/>Mercredi
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{thursday}"/>Jeudi
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{friday}"/>Vendredi
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" th:field="*{saturday}"/>Samedi
+                </label>
+            </div>
+            <button class="btn btn-primary col-sm-2 col-sm-offset-1" type="submit">Sauver</button>
+            <!--<button th:onclick="'window.location.href=\'' + @{/jobs/} + '\''">Cancel</button>-->
+
+            <input class="btn btn-danger col-sm-2 col-sm-offset-1" type="button"
+                   th:onclick="'window.location.replace(\'' + @{/jobs/} + '\')'"
+                   value="Annuler"/>
+
+    </div>
+    </form>
+</div>
+</div>
+
+</body>
+</html>
