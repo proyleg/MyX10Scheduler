@@ -2,8 +2,10 @@ package com.myscheduler.job;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.myscheduler.ahscript.IActiveHome;
 import com.myscheduler.dao.JobList;
 import com.myscheduler.model.JobToSchedule;
+import com.myscheduler.model.Module;
 import com.myscheduler.service.JobListService;
 import com.myscheduler.service.JobToScheduleService;
 import com.myscheduler.service.ModuleService;
@@ -23,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.myscheduler.MyX10SchedulerApplication.*;
 import static java.time.LocalDate.now;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -68,6 +71,7 @@ public class JobScheduler {
 
     public void scheduleX10Jobs() {
         logger.info("Executing JobScheduler scheduleX10Jobs");
+        synchModulesWithDB();
         Calendar nowTime = Calendar.getInstance();
         if (askedSunriseSunset == null || getTimeDiff(nowTime.getTime(), askedSunriseSunset.getTime()) > 1)
             getSunriseSunset();
@@ -104,8 +108,8 @@ public class JobScheduler {
             if (startTime.before(nowTime)) continue;
             String x10Address = "";
             if (jobToSchedule.getModule() != null) {
-                x10Address = moduleService.getModuleById(jobToSchedule.getModule()).getAddresslet() +
-                        moduleService.getModuleById(jobToSchedule.getModule()).getAddressnum();
+                x10Address = moduleService.getModuleById(jobToSchedule.getModule()).get().getAddresslet() +
+                        moduleService.getModuleById(jobToSchedule.getModule()).get().getAddressnum();
             }
             scheduleTheX10Job(scheduler, jobToSchedule, x10Address, startTime.getTime(), "");
         }
@@ -140,17 +144,34 @@ public class JobScheduler {
                 logger.error("Asking for Temperature failed");
             }
             for (JobList jobList : jobLists) {
-                JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(Long.valueOf(jobList.getJobName().split("_")[1]));
+                JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(Long.valueOf(jobList.getJobName().split("_")[1])).get();
                 if (jobToSchedule.getTemperature() == null || Float.valueOf(temperature) >= jobToSchedule.getTemperature()) {
                     try {
                         scheduler.getScheduler().resumeJob(jobList.getJobKey());
-                        Thread.sleep(60 * 1000L);       // x seconds
+//                        Thread.sleep(6 * 1000L);       // x seconds was 60
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
+    }
+
+    private void synchModulesWithDB() {
+        ArrayList<Module> modules = (ArrayList<Module>) moduleService.getAllModules();
+        IActiveHome ah = null;
+        for (Module module : modules) {
+            logger.info("Executing JobScheduler synchModulesWithDB " + module.getName() + " " + module.getAddresslet() + module.getAddressnum() + " " + module.getStatus() + " ");
+            if (isProduction()) ah = (IActiveHome) getCtx().getBean("x10Container");
+            for (int i = 0; i < 1 + getMultiSendNumberOfRetry(); i++) {
+                if (isProduction()) ah.sendAction("sendplc", module.getAddresslet() + module.getAddressnum() + " " + module.getStatus(), "", "");
+                try {
+                    Thread.sleep(getMultiSendNumberOfSecond() * 1000L);       // x seconds
+                } catch (Exception ignore) {
+                }
+            }
+        }
+        ;
     }
 
     private void getSunriseSunset() {

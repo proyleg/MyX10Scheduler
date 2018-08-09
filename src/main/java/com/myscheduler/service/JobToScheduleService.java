@@ -3,12 +3,14 @@ package com.myscheduler.service;
 import com.myscheduler.model.JobToSchedule;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Created by Pierre on 2016-04-11.
  */
 @Service
 public interface JobToScheduleService {
-    JobToSchedule getJobToScheduleById(Long id);
+    Optional<JobToSchedule> getJobToScheduleById(Long id);
 
     Iterable<JobToSchedule> getAllJobToSchedule();
 

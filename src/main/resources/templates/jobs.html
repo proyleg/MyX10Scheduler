@@ -1,10 +1,11 @@
 <!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <th:block th:include="fragments/headerinc :: head"></th:block>
 <script type="text/javascript" language="javascript" class="init">
+    var pathArray = window.location.pathname.split('/');
     $(document).ready(function () {
-        var pathArray = window.location.pathname.split('/');
         $('#jobs_list').DataTable({
-            order: [[1, "asc"]],
+            order: [ [1, "asc"] ],
             stateSave: true,
 //            stateDuration: -1,
             columnDefs: [
@@ -19,16 +20,14 @@
         });
     });
 </script>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Jobs</title>
 </head>
 <body>
 <div class="container">
-    <!--/*@thymesVar id="jobs" type="java.lang.Iterable<com.myscheduler.model.JobToSchedule>"*/-->
     <div class="table-responsive" th:if="!${#lists.isEmpty(jobs)}">
         <h2>Liste des jobs</h2>
-        <table class="table table-bordered table-condensed" id="jobs_list">
+        <table class="table table-bordered table-sm" id="jobs_list">
             <thead>
             <tr>
                 <th>Id</th>
@@ -66,25 +65,24 @@
             </tr>
             </tfoot>
             <tr th:each="job : ${jobs}"
-                th:class="${job.status==T(com.myscheduler.model.StatusType).Active} ? success : danger">
-                <!--/*@thymesVar id="job" type="com.myscheduler.model.JobToSchedule"*/-->
+                th:class="${job.status==T(com.myscheduler.model.StatusType).Active} ? 'table-success' : 'table-danger'">
                 <td th:text="${job.idJob}">Id</td>
                 <td th:text="${job.name}">Nom</td>
                 <td th:text="${job.scheduleType}">Type</td>
                 <td th:text="${#dates.format(job.scheduleTime,'HH:mm')}">Heure</td>
                 <td th:text="${job.offset}">Type</td>
                 <td th:text="${job.security} ? 'Oui' : 'Non'"></td>
-                <td><a class="btn btn-default btn-sm active" th:href="@{/job/edit/} + ${job.idJob}">Edit</a></td>
-                <td><a class="btn btn-default btn-sm active" th:href="@{/job/duplicate/} + ${job.idJob}">Dupliquer</a>
+                <td><a class="btn btn-outline-secondary btn-sm active" th:href="@{|/job/edit/${job.idJob}|}">Edit</a></td>
+                <td><a class="btn btn-outline-secondary btn-sm active" th:href="@{|/job/duplicate/${job.idJob}|}">Dupliquer</a>
                 </td>
-                <td><a class="btn btn-default btn-sm active" th:href="@{/job/delete/} + ${job.idJob}">Delete</a></td>
+                <td><a class="btn btn-outline-secondary btn-sm active" th:href="@{|/job/delete/${job.idJob}|}">Delete</a></td>
                 <td th:if="${job.status==T(com.myscheduler.model.StatusType).Inactive}"><a
-                        class="btn btn-default btn-sm active" th:href="@{/job/dis-active/} + ${job.idJob}">Activer</a>
+                        class="btn btn-outline-secondary btn-sm active" th:href="@{|/job/dis-active/${job.idJob}|}">Activer</a>
                 </td>
                 <td th:if="${job.status==T(com.myscheduler.model.StatusType).Active}"><a
-                        class="btn btn-default btn-sm active"
-                        th:href="@{/job/dis-active/} + ${job.idJob}">Désactiver</a></td>
-                <td><a class="btn btn-default btn-sm active" th:href="@{/job/executenow/} + ${job.idJob}">Exécute</a>
+                        class="btn btn-outline-secondary btn-sm active"
+                        th:href="@{|/job/dis-active/${job.idJob}|}">Désactiver</a></td>
+                <td><a class="btn btn-outline-secondary btn-sm active" th:href="@{|/job/executenow/${job.idJob}|}">Exécute</a>
                 </td>
             </tr>
         </table>

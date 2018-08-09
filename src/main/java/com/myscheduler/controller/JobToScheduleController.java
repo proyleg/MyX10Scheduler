@@ -134,7 +134,7 @@ public class JobToScheduleController {
 
     @RequestMapping("job/duplicate/{id}")
     public String duplicateJob(@PathVariable Long id, Model model) {
-        JobToSchedule jobToScheduleFrom = jobToScheduleService.getJobToScheduleById(id);
+        JobToSchedule jobToScheduleFrom = jobToScheduleService.getJobToScheduleById(id).get();
         JobToSchedule jobToSchedule = new JobToSchedule();
         BeanUtils.copyProperties(jobToScheduleFrom, jobToSchedule);
         jobToSchedule.setIdJob(null);
@@ -147,7 +147,7 @@ public class JobToScheduleController {
 
     @RequestMapping("job/dis-active/{id}")
     public String disableJob(@PathVariable Long id, Model model) {
-        JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(id);
+        JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(id).get();
         if (jobToSchedule.getStatus().equals(StatusType.Active)) {
             jobToSchedule.setStatus(StatusType.Inactive);
             try {
@@ -169,12 +169,12 @@ public class JobToScheduleController {
 
     @RequestMapping("job/executenow/{id}")
     public String executeJobNow(@PathVariable Long id) {
-        JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(id);
+        JobToSchedule jobToSchedule = jobToScheduleService.getJobToScheduleById(id).get();
         Date now = new Date(System.currentTimeMillis());
         String x10Address = "";
         if (jobToSchedule.getModule() != null) {
-            x10Address = moduleService.getModuleById(jobToSchedule.getModule()).getAddresslet() +
-                    moduleService.getModuleById(jobToSchedule.getModule()).getAddressnum();
+            x10Address = moduleService.getModuleById(jobToSchedule.getModule()).get().getAddresslet() +
+                    moduleService.getModuleById(jobToSchedule.getModule()).get().getAddressnum();
         }
         scheduleTheX10Job(scheduler, jobToSchedule, x10Address, now, "now_");
         return "redirect:/" + JOBS_LIST;

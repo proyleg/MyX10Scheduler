@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Created by Pierre on 2016-04-27.
  */
@@ -31,8 +33,8 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     @Override
-    public Module getModuleById(Integer id) {
-        return moduleRepository.findOne(id);
+    public Optional<Module> getModuleById(Integer id) {
+        return moduleRepository.findById(id);
     }
 
     @Override

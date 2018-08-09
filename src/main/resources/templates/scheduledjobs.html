@@ -1,9 +1,11 @@
 <!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <th:block th:include="fragments/headerinc :: head"></th:block>
 <script type="text/javascript" language="javascript" class="init">
+    var pathArray = window.location.pathname.split('/');
     $(document).ready(function () {
-        var pathArray = window.location.pathname.split('/');
         $('#scheduledjobs').DataTable({
+            order: [ [2, "asc"] ],
             stateSave: true,
             "language": {
                 "url": "/" + pathArray[1] + "/DataTables/i18n/French.json"
@@ -11,13 +13,11 @@
         });
     });
 </script>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Jobs</title>
 </head>
 <body>
 <div class="container">
-    <!--/*@thymesVar id="jobs" type="java.lang.Iterable<com.myscheduler.dao.JobList>"*/-->
     <div th:if="!${#lists.isEmpty(jobs)}">
         <h2>Liste des jobs cédulées</h2>
         <table class="table table-bordered table-condensed" id="scheduledjobs">
@@ -31,13 +31,12 @@
             </tr>
             </thead>
             <tr th:each="job : ${jobs}">
-                <!--/*@thymesVar id="job" type="com.myscheduler.dao.JobList"*/-->
                 <td th:text="${job.jobName}">Id</td>
                 <td th:text="${job.jobGroup}">Nom</td>
                 <td th:text="${job.nextFireTime}">Heure</td>
                 <td th:text="${job.state}">Etat</td>
-                <td><a th:if="${!job.jobName.startsWith('method')}" class="btn btn-default btn-sm active"
-                       th:href="@{/scheduledjobs/cancel/} + ${job.jobName}">Cancel</a></td>
+                <td><a th:if="${!job.jobName.startsWith('method')}" class="btn btn-outline-secondary btn-sm active"
+                       th:href="@{|/scheduledjobs/cancel/${job.jobName}|}">Cancel</a></td>
             </tr>
         </table>
         <div class="container-fluid">

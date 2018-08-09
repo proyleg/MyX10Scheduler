@@ -9,6 +9,8 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.myscheduler.MyX10SchedulerApplication.*;
 
 public class X10Job implements Job {
@@ -22,17 +24,23 @@ public class X10Job implements Job {
         String command = dataMap.getString("command");
         boolean multiSend = dataMap.getBoolean("multiSend");
         JobKey jobKey = jobExecutionContext.getJobDetail().getKey();
-        logger.info("Executing X10Job " + jobKey + " " + x10Address + " " + command + " ");
-        if (isProduction()) {
-            IActiveHome ah = (IActiveHome) getCtx().getBean("x10Container");
-            for (int i = 0; i < 1 + getMultiSendNumberOfRetry(); i++) {
-                ah.sendAction("sendplc", x10Address + " " + command, "", "");
-                if (!multiSend) break;
-                try {
-                    Thread.sleep(getMultiSendNumberOfSecond() * 1000L);       // x seconds
-                } catch (Exception ignore) {
+        try {
+            if (getAhlock().tryLock(10, TimeUnit.SECONDS)) {
+                IActiveHome ah = null;
+                if (isProduction()) ah = (IActiveHome) getCtx().getBean("x10Container");
+                for (int i = 0; i < 1 + getMultiSendNumberOfRetry(); i++) {
+                    if (isProduction()) ah.sendAction("sendplc", x10Address + " " + command, "", "");
+                    if (!multiSend) break;
+                    try {
+                        Thread.sleep(getMultiSendNumberOfSecond() * 1000L);       // x seconds
+                    } catch (Exception ignore) {
+                    }
                 }
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            getAhlock().unlock();
         }
     }
 }

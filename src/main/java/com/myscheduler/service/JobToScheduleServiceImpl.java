@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Created by Pierre on 2016-04-11.
  */
@@ -20,13 +22,13 @@ public class JobToScheduleServiceImpl implements JobToScheduleService {
     }
 
     @Override
-    public JobToSchedule getJobToScheduleById(Long id) {
-        return jobToScheduleRepository.findOne(id);
+    public Optional<JobToSchedule> getJobToScheduleById(Long id) {
+        return jobToScheduleRepository.findById(id);
     }
 
     @Override
     public Iterable<JobToSchedule> getAllJobToSchedule() {
-        return jobToScheduleRepository.findAll(new Sort("name"));
+        return jobToScheduleRepository.findAll(Sort.by("name"));
     }
 
     @Override
@@ -71,6 +73,6 @@ public class JobToScheduleServiceImpl implements JobToScheduleService {
 
     @Override
     public void deleteJobToScheduleById(Long id) {
-        jobToScheduleRepository.delete(id);
+        jobToScheduleRepository.deleteById(id);
     }
 }
